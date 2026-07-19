@@ -17,6 +17,37 @@
       --warning: #fff4dd;
       --success: #daf0e7;
       --shadow: 0 8px 24px rgba(24, 32, 40, 0.08);
+      --surface: #fbfcfc;
+      --tab-bg: #e8edef;
+      --secondary: #e9eef0;
+    }
+
+    html[data-theme="dark"] {
+      --bg: #101619;
+      --card: #182126;
+      --text: #edf4f3;
+      --muted: #a4b1b4;
+      --accent: #6fa79f;
+      --accent-dark: #91c5bd;
+      --accent-soft: #243b3a;
+      --border: #314047;
+      --warning: #3b3020;
+      --success: #203b33;
+      --shadow: 0 8px 24px rgba(0,0,0,.28);
+      --surface: #151d21;
+      --tab-bg: #222c31;
+      --secondary: #2a353a;
+      color-scheme: dark;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      html[data-theme="auto"] {
+        --bg: #101619; --card: #182126; --text: #edf4f3; --muted: #a4b1b4;
+        --accent: #6fa79f; --accent-dark: #91c5bd; --accent-soft: #243b3a;
+        --border: #314047; --warning: #3b3020; --success: #203b33;
+        --shadow: 0 8px 24px rgba(0,0,0,.28); --surface: #151d21;
+        --tab-bg: #222c31; --secondary: #2a353a; color-scheme: dark;
+      }
     }
 
     * { box-sizing: border-box; }
@@ -103,12 +134,12 @@
 
     .main-tabs {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-bottom: 18px;
       padding: 5px;
       border-radius: 16px;
-      background: #e8edef;
+      background: var(--tab-bg);
     }
 
     .main-tab {
@@ -237,7 +268,7 @@
       padding: 12px;
       border: 1px solid var(--border);
       border-radius: 14px;
-      background: #fbfcfc;
+      background: var(--surface);
     }
 
     .step input {
@@ -294,7 +325,7 @@
     }
 
     .primary { background: var(--accent); color: white; }
-    .secondary { background: #e9eef0; color: var(--text); }
+    .secondary { background: var(--secondary); color: var(--text); }
 
     .progress-wrap { margin-top: 16px; }
 
@@ -357,7 +388,7 @@
       aspect-ratio: 1 / 1;
       min-height: 48px;
       border: 1px solid var(--border);
-      background: #fbfcfc;
+      background: var(--surface);
       border-radius: 13px;
       display: flex;
       flex-direction: column;
@@ -405,6 +436,20 @@
       vertical-align: -1px;
     }
 
+    .stats-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+    .metric { text-align:center; padding:18px 10px; }
+    .metric strong { display:block; font-size:1.8rem; margin-bottom:4px; }
+    .metric span { color:var(--muted); font-size:.9rem; }
+    .chart { display:flex; align-items:end; gap:8px; height:190px; padding:16px 4px 0; overflow-x:auto; }
+    .bar-wrap { min-width:38px; flex:1; display:flex; flex-direction:column; justify-content:end; align-items:center; height:100%; gap:6px; }
+    .bar { width:100%; max-width:46px; min-height:3px; background:var(--accent); border-radius:8px 8px 3px 3px; }
+    .bar-wrap small { color:var(--muted); font-size:.72rem; }
+    .settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:16px; }
+    .field { display:grid; gap:6px; margin:12px 0; }
+    .field label { font-weight:800; }
+    select, input[type="time"] { width:100%; padding:11px; border:1px solid var(--border); border-radius:12px; background:var(--surface); color:var(--text); font:inherit; }
+    .status { color:var(--muted); font-size:.9rem; margin-top:8px; }
+
     footer {
       color: var(--muted);
       text-align: center;
@@ -413,7 +458,8 @@
     }
 
     @media (max-width: 720px) {
-      .section-grid { grid-template-columns: 1fr; }
+      .section-grid, .settings-grid { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
       .app { width: min(100% - 16px, 1000px); padding-top: 12px; }
       header, .card { border-radius: 16px; }
       .calendar-grid { gap: 4px; }
@@ -463,6 +509,7 @@
     <nav class="main-tabs">
       <button class="main-tab active" data-view="routineView">📋 Rutine</button>
       <button class="main-tab" data-view="calendarView">📅 Kalender</button>
+      <button class="main-tab" data-view="statsView">📊 Statistikk</button>
     </nav>
 
     <section id="routineView" class="view">
@@ -554,6 +601,34 @@
           <span><i class="legend-dot" style="background:white; border:2px solid var(--accent);"></i>I dag</span>
         </div>
       </article>
+    </section>
+
+
+    <section id="statsView" class="view hidden">
+      <div class="stats-grid">
+        <article class="card metric"><strong id="statsMonthDone">0</strong><span>Dager denne måneden</span></article>
+        <article class="card metric"><strong id="statsMonthPercent">0 %</strong><span>Fullføring denne måneden</span></article>
+        <article class="card metric"><strong id="statsTotal">0</strong><span>Fullførte dager totalt</span></article>
+        <article class="card metric"><strong id="statsBest">0</strong><span>Beste streak</span></article>
+      </div>
+      <article class="card">
+        <h2>📈 Siste 12 måneder</h2>
+        <div class="chart" id="monthChart"></div>
+      </article>
+      <div class="settings-grid">
+        <article class="card">
+          <h2>🌙 Utseende</h2>
+          <div class="field"><label for="themeSelect">Tema</label><select id="themeSelect"><option value="auto">Følg telefonen</option><option value="light">Lyst</option><option value="dark">Mørkt</option></select></div>
+        </article>
+        <article class="card">
+          <h2>🔔 Varsler</h2>
+          <div class="field"><label for="morningTime">Morgen</label><input id="morningTime" type="time" value="07:00"></div>
+          <div class="field"><label for="eveningTime">Kveld</label><input id="eveningTime" type="time" value="21:00"></div>
+          <button class="action primary" id="enableNotifications">Aktiver varsler</button>
+          <p class="status" id="notificationStatus">Varsler er ikke aktivert.</p>
+          <p class="status">Påminnelser vises når appen er åpen eller nylig har vært aktiv. Android kan stoppe helt presise varsler når appen er lukket lenge.</p>
+        </article>
+      </div>
     </section>
 
     <footer>Alt lagres lokalt i nettleseren på enheten din.</footer>
@@ -709,6 +784,7 @@
       renderWeekTabs();
       renderCalendar();
       updateStreaks();
+      renderStats();
     }
 
     function isCompleted(date) {
@@ -825,11 +901,70 @@
       }
     }
 
+    function getCompletedDateStrings() {
+      const out=[];
+      for (let i=0;i<localStorage.length;i++) {
+        const key=localStorage.key(i);
+        if (key?.startsWith("skin-v2-completed-") && localStorage.getItem(key)==="1") out.push(key.replace("skin-v2-completed-", ""));
+      }
+      return out.sort();
+    }
+
+    function calculateBestStreak(strings) {
+      let best=0, running=0, previous=null;
+      strings.forEach(ds=>{ const current=new Date(ds+"T00:00:00"); running=(previous && Math.round((current-previous)/86400000)===1)?running+1:1; best=Math.max(best,running); previous=current; });
+      return best;
+    }
+
+    function renderStats() {
+      const strings=getCompletedDateStrings();
+      const now=new Date();
+      const monthPrefix=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+      const monthDone=strings.filter(x=>x.startsWith(monthPrefix)).length;
+      const daysInMonth=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();
+      document.getElementById("statsMonthDone").textContent=monthDone;
+      document.getElementById("statsMonthPercent").textContent=Math.round(monthDone/daysInMonth*100)+" %";
+      document.getElementById("statsTotal").textContent=strings.length;
+      document.getElementById("statsBest").textContent=calculateBestStreak(strings);
+      const chart=document.getElementById("monthChart"); chart.innerHTML="";
+      const data=[];
+      for(let i=11;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); const prefix=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`; data.push({label:monthNames[d.getMonth()].slice(0,3), value:strings.filter(x=>x.startsWith(prefix)).length}); }
+      const max=Math.max(1,...data.map(x=>x.value));
+      data.forEach(x=>{ const wrap=document.createElement("div"); wrap.className="bar-wrap"; wrap.innerHTML=`<b>${x.value}</b><div class="bar" style="height:${Math.max(3,x.value/max*125)}px"></div><small>${x.label}</small>`; chart.appendChild(wrap); });
+    }
+
+    const themeSelect=document.getElementById("themeSelect");
+    function applyTheme(value){ document.documentElement.dataset.theme=value; localStorage.setItem("skin-v2-theme",value); themeSelect.value=value; }
+    applyTheme(localStorage.getItem("skin-v2-theme")||"auto");
+    themeSelect.addEventListener("change",e=>applyTheme(e.target.value));
+
+    const morningTime=document.getElementById("morningTime"), eveningTime=document.getElementById("eveningTime"), notificationStatus=document.getElementById("notificationStatus");
+    morningTime.value=localStorage.getItem("skin-v2-morning-time")||"07:00"; eveningTime.value=localStorage.getItem("skin-v2-evening-time")||"21:00";
+    [morningTime,eveningTime].forEach(el=>el.addEventListener("change",()=>localStorage.setItem(el===morningTime?"skin-v2-morning-time":"skin-v2-evening-time",el.value)));
+    function refreshNotificationStatus(){ notificationStatus.textContent=("Notification" in window && Notification.permission==="granted")?"Varsler er aktivert.":"Varsler er ikke aktivert."; }
+    document.getElementById("enableNotifications").addEventListener("click",async()=>{
+      if (!("Notification" in window)) { notificationStatus.textContent="Denne nettleseren støtter ikke varsler."; return; }
+      const permission=await Notification.requestPermission(); refreshNotificationStatus(); if(permission==="granted") showReminder("Varsler aktivert","Du får påminnelser om morgen- og kveldsrutinen.");
+    });
+    async function showReminder(title,body){
+      if(Notification.permission!=="granted") return;
+      const reg=await navigator.serviceWorker?.ready;
+      if(reg) reg.showNotification(title,{body,icon:"icon-192.png",badge:"icon-192.png",tag:title}); else new Notification(title,{body,icon:"icon-192.png"});
+    }
+    function checkReminders(){
+      if (!("Notification" in window) || Notification.permission!=="granted") return;
+      const now=new Date(), hhmm=`${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`, date=isoDate(now);
+      const checks=[[morningTime.value,"morning","🌞 Morgenrutine","Tid for morgenrutinen og SPF 50."],[eveningTime.value,"evening","🌙 Kveldsrutine","Tid for kveldsrutinen din."]];
+      checks.forEach(([time,id,title,body])=>{ const key=`skin-v2-notified-${date}-${id}`; if(hhmm>=time && !localStorage.getItem(key) && !isCompleted(now)){ localStorage.setItem(key,"1"); showReminder(title,body); } });
+    }
+    refreshNotificationStatus(); setInterval(checkReminders,30000); checkReminders();
+
     document.querySelectorAll(".main-tab").forEach(tab => {
       tab.addEventListener("click", () => {
         document.querySelectorAll(".main-tab").forEach(t => t.classList.toggle("active", t === tab));
         document.querySelectorAll(".view").forEach(view => view.classList.toggle("hidden", view.id !== tab.dataset.view));
         if (tab.dataset.view === "calendarView") renderCalendar();
+        if (tab.dataset.view === "statsView") renderStats();
       });
     });
 
@@ -874,6 +1009,7 @@
     renderSelectedDate();
     renderCalendar();
     updateStreaks();
+    renderStats();
   </script>
 
   <script>

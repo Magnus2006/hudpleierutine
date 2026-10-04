@@ -467,6 +467,14 @@
     }
   
 
+    a { color:var(--accent-dark); }
+    button:focus-visible, select:focus-visible, input:focus-visible, summary:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+    .product-item { grid-template-columns:42px minmax(0,1fr); }
+    #goToday { margin-bottom:10px; }
+    details { margin-top:16px; }
+    details p { margin-top:10px; }
+    .step small, .product-item small { font-size:.875rem; }
+    .cal-day { color:var(--text); font:inherit; }
     /* V3 – samlet Material 3 / One UI-inspirert design */
     :root {
       --bg: #f2f5f4; --card: #ffffff; --surface: #f7f9f8; --text: #17201f;
@@ -522,7 +530,7 @@
     .primary { background:var(--accent); }
     .full-width { width:100%; }
     .product-list { display:grid; gap:9px; }
-    .product-item { display:grid; grid-template-columns:42px 1fr auto; gap:11px; align-items:center; padding:11px; border:1px solid var(--border); border-radius:17px; background:var(--surface); }
+    .product-item { display:grid; grid-template-columns:42px minmax(0,1fr); gap:11px; align-items:center; padding:11px; border:1px solid var(--border); border-radius:17px; background:var(--surface); }
     .product-icon { width:42px;height:42px;display:grid;place-items:center;background:var(--accent-soft);border-radius:13px;font-size:20px; }
     .product-item small { display:block; color:var(--muted); margin-top:2px; line-height:1.25; }
     .check-badge { width:25px;height:25px;display:grid;place-items:center;border-radius:50%;background:var(--success);color:var(--accent-strong);font-weight:900; }
@@ -615,7 +623,7 @@
 
       <div class="progress-wrap">
         <div class="progress-label">
-          <span>Fremgang i dag</span>
+          <span>Fremgang for valgt dag</span>
           <strong id="progressText">0 %</strong>
         </div>
         <div class="progress"><div id="progressBar"></div></div>
@@ -635,6 +643,7 @@
         <button class="icon-btn" id="nextWeek" aria-label="Neste uke">›</button>
       </div>
 
+      <button class="action secondary" id="goToday">Til i dag</button>
       <nav class="tabs" id="dayTabs" aria-label="Velg dato"></nav>
 
       <section class="section-grid">
@@ -644,35 +653,41 @@
             <div class="step">
               <input type="checkbox" id="morning-cleanser">
               <label for="morning-cleanser">
-                Cleanser
-                <small>Massér i 20–30 sekunder. Skyll med lunkent vann og klapp huden tørr.</small>
+                CeraVe Hydrating Cleanser
+                <small>Grønn flaske. Massér forsiktig på fuktig hud og skyll med lunkent vann. Klapp huden lett tørr.</small>
               </label>
             </div>
-            <div class="wait">⏳ Vent 2–5 minutter</div>
+
             <div class="step">
               <input type="checkbox" id="morning-moisturizer">
               <label for="morning-moisturizer">
-                Moisturizer
-                <small>Påfør et tynt og jevnt lag.</small>
+                Fuktighetskrem
+                <small>La Roche-Posay Toleriane Sensitive Cream. Påfør på lett fuktig hud.</small>
               </label>
             </div>
-            <div class="wait">⏳ Vent 1–2 minutter</div>
+
             <div class="step">
               <input type="checkbox" id="morning-spf">
               <label for="morning-spf">
-                SPF 50
-                <small>Påfør rikelig som siste steg.</small>
+                Eucerin Sun Oil Control SPF 50+
+                <small>Gel-Cream til ansikt. La kremen trekke inn, og påfør solkremen rikelig som siste steg før du går ut. Påfør på nytt ved lengre opphold ute, særlig etter svette eller bading.</small>
               </label>
             </div>
           </div>
+          <div class="actions"><button class="action primary" id="completeMorning">Morgen ferdig</button></div>
         </article>
 
         <article class="card">
           <h2>🌙 Kveld</h2>
+          <div class="field" id="cleanserChoice">
+            <label for="eveningMode">Rens denne kvelden</label>
+            <select id="eveningMode"><option value="blemish">Blå – Blemish Control</option><option value="gentle">Grønn – skånsom kveld</option></select>
+          </div>
           <div id="eveningRoutine"></div>
 
           <div class="actions">
-            <button class="action primary" id="completeAll">Merk dagen som ferdig</button>
+            <button class="action primary" id="completeEvening">Kveld ferdig</button>
+            <button class="action secondary" id="completeAll">Merk dagen som ferdig</button>
             <button class="action secondary" id="resetDay">Nullstill dagen</button>
           </div>
         </article>
@@ -682,22 +697,23 @@
         <article class="card">
           <h2>🛍️ Produkter</h2>
           <div class="product-list">
-            <div class="product-item"><span class="product-icon">🧼</span><div><strong>Cleanser</strong><small>La Roche-Posay Toleriane Dermo-Cleanser</small></div><span class="check-badge">✓</span></div>
-            <div class="product-item"><span class="product-icon">💧</span><div><strong>Moisturizer</strong><small>La Roche-Posay Toleriane Sensitive Cream</small></div><span class="check-badge">✓</span></div>
-            <div class="product-item"><span class="product-icon">✨</span><div><strong>Azelaic Acid</strong><small>The Ordinary Azelaic Acid 10 %</small></div><span class="check-badge">✓</span></div>
-            <div class="product-item"><span class="product-icon">🫧</span><div><strong>BHA 2 %</strong><small>Paula’s Choice Skin Perfecting Liquid</small></div><span class="check-badge">✓</span></div>
-            <div class="product-item"><span class="product-icon">☀️</span><div><strong>SPF 50+</strong><small>Beauty of Joseon Relief Sun</small></div><span class="check-badge">✓</span></div>
+            <div class="product-item"><span class="product-icon">🧼</span><div><strong>CeraVe Hydrating Cleanser</strong><small>Grønn · morgen og skånsomme kvelder · skylles av</small></div></div>
+            <div class="product-item"><span class="product-icon">🫧</span><div><strong>CeraVe Blemish Control Cleanser</strong><small>Blå · kveld · salisylsyre (BHA) · skylles av</small></div></div>
+            <div class="product-item"><span class="product-icon">💧</span><div><strong>La Roche-Posay Toleriane Sensitive Cream</strong><small>Fuktighetskrem · etter rens morgen og kveld</small></div></div>
+            <div class="product-item"><span class="product-icon">☀️</span><div><strong>Eucerin Sun Oil Control Gel-Cream SPF 50+</strong><small>Ansikt · 50 ml · siste steg om morgenen</small></div></div>
           </div>
         </article>
 
         <article class="card rules">
           <h2>📌 Husk</h2>
           <ul>
-            <li>Ikke bruk BHA og azelainsyre samme kveld.</li>
-            <li>BHA og azelainsyre skal ikke vaskes av.</li>
-            <li>Bruk SPF hver morgen.</li>
-            <li>Reduser aktive ingredienser ved svie, sterk rødhet eller flassing.</li>
+            <li>Begge rensene skal skylles av. Unngå øynene og ikke skrubb.</li>
+            <li>Start med blå rens annenhver kveld hvis huden lett blir irritert. Velg grønn rens de andre kveldene.</li>
+            <li>Ved tørrhet, svie eller flassing: ta pause fra blå rens og bruk grønn rens og fuktighetskrem.</li>
+            <li>Paula’s Choice BHA og The Ordinary azelainsyre er satt på pause i den nye rutinen.</li>
+            <li>Blemish Control er mot uren hud og kviser, ikke behandling for hudinfeksjon.</li>
           </ul>
+          <details><summary>Produktinformasjon</summary><p><a href="https://www.cerave.no/alle-produkter/hydrating-cleanser" target="_blank" rel="noopener">Grønn CeraVe-rens</a> · <a href="https://www.cerave.no/alle-produkter/blemish-control-cleanser" target="_blank" rel="noopener">Blå CeraVe-rens</a> · <a href="https://int.eucerin.com/products/sun-protection/sun-gel-creme-dry-touch-spf-50plus" target="_blank" rel="noopener">Eucerin SPF</a></p></details>
         </article>
       </section>
     </section>
@@ -775,14 +791,15 @@
       "juli", "august", "september", "oktober", "november", "desember"
     ];
 
-    const today = startOfDay(new Date());
+    let today = startOfDay(new Date());
     let selectedDate = new Date(today);
     let weekAnchor = startOfWeek(selectedDate);
     let calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
     const morningIds = ["morning-cleanser", "morning-moisturizer", "morning-spf"];
 
-    const eveningTemplates = {
+    const routineUpdatedOn = "2026-10-04";
+    const legacyEveningTemplates = {
       mandag: [
         step("evening-cleanser", "Cleanser", "Massér 20–30 sekunder og skyll av."),
         wait("Vent 2–5 minutter"),
@@ -897,10 +914,10 @@
           updateCompletionState();
         };
       });
-      updateCompletionState();
+      updateCompletionState(false);
     }
 
-    function updateCompletionState() {
+    function updateCompletionState(saveCompletion = true) {
       const boxes = getRoutineCheckboxes();
       const checked = boxes.filter(box => box.checked).length;
       const percent = boxes.length ? Math.round((checked / boxes.length) * 100) : 0;
@@ -908,10 +925,12 @@
       document.getElementById("progressBar").style.width = percent + "%";
       document.getElementById("progressText").textContent = percent + " %";
 
-      if (boxes.length && checked === boxes.length) {
-        localStorage.setItem(completedKey(selectedDate), "1");
-      } else {
-        localStorage.removeItem(completedKey(selectedDate));
+      if (saveCompletion) {
+        if (boxes.length && checked === boxes.length) {
+          localStorage.setItem(completedKey(selectedDate), "1");
+        } else {
+          localStorage.removeItem(completedKey(selectedDate));
+        }
       }
 
       renderWeekTabs();
@@ -937,8 +956,18 @@
 
     function renderEveningRoutine() {
       const dayName = dayNames[selectedDate.getDay()];
+      const historical = isoDate(selectedDate) < routineUpdatedOn;
+      const mode = localStorage.getItem(storageKey("cleanser-mode")) || "blemish";
+      document.getElementById("cleanserChoice").hidden = historical;
+      document.getElementById("eveningMode").value = mode;
+      const routine = historical ? legacyEveningTemplates[dayName] : [
+        step("evening-cleanser", mode === "gentle" ? "CeraVe Hydrating Cleanser" : "CeraVe Blemish Control Cleanser",
+          mode === "gentle" ? "Grønn flaske. Massér forsiktig på fuktig hud og skyll godt av." : "Blå flaske. Massér forsiktig på fuktig hud, unngå øynene og skyll godt av. Maks én gang daglig i denne rutinen."),
+        step("evening-moisturizer", "Fuktighetskrem", "La Roche-Posay Toleriane Sensitive Cream. Påfør etter rens på lett fuktig hud.")
+      ];
       document.getElementById("eveningRoutine").innerHTML =
-        `<div class="routine-list">${eveningTemplates[dayName].join("")}</div>`;
+        (historical ? '<p class="status">Tidligere kveldsrutine · historikken er bevart.</p>' : "") +
+        `<div class="routine-list">${routine.join("")}</div>`;
     }
 
     function renderWeekTabs() {
@@ -1034,7 +1063,8 @@
 
       for (let i = 0; i < 42; i++) {
         const date = addDays(gridStart, i);
-        const cell = document.createElement("div");
+        const cell = document.createElement("button");
+        cell.type = "button";
         cell.className = "cal-day";
         cell.textContent = date.getDate();
 
@@ -1044,6 +1074,7 @@
         if (progress === 100) cell.classList.add("completed");
         else if (progress > 0) cell.classList.add("partial");
 
+        cell.setAttribute("aria-label", formatDate(date));
         cell.title = formatDate(date) + (progress === 100 ? " – fullført" : progress > 0 ? " – delvis" : "");
         cell.addEventListener("click", () => {
           selectedDate = startOfDay(date);
@@ -1158,6 +1189,30 @@
     });
 
     function showToast(message){ const el=document.getElementById("achievementToast"); el.textContent=message; el.classList.add("show"); clearTimeout(window.toastTimer); window.toastTimer=setTimeout(()=>el.classList.remove("show"),2800); }
+
+    document.getElementById("goToday").addEventListener("click", () => {
+      today = startOfDay(new Date());
+      selectedDate = new Date(today);
+      weekAnchor = startOfWeek(selectedDate);
+      renderSelectedDate();
+    });
+    document.getElementById("eveningMode").addEventListener("change", event => {
+      localStorage.setItem(storageKey("cleanser-mode"), event.target.value);
+      // Changing the product means the cleansing step needs to be confirmed again.
+      localStorage.setItem(storageKey("evening-cleanser"), "0");
+      renderEveningRoutine();
+      loadSelectedDateState();
+      updateCompletionState();
+    });
+    function completeSession(prefix) {
+      getRoutineCheckboxes().filter(box => box.id.startsWith(prefix)).forEach(box => {
+        box.checked = true; saveCheckbox(box);
+      });
+      updateCompletionState();
+      showToast(prefix === "morning-" ? "🌞 Morgenrutinen er fullført" : "🌙 Kveldsrutinen er fullført");
+    }
+    document.getElementById("completeMorning").addEventListener("click", () => completeSession("morning-"));
+    document.getElementById("completeEvening").addEventListener("click", () => completeSession("evening-"));
 
     document.getElementById("completeAll").addEventListener("click", () => {
       const wasComplete=isCompleted(selectedDate);
